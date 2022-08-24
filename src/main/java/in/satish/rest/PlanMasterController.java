@@ -14,15 +14,22 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import in.satish.constants.AppConstants;
 import in.satish.entity.PlanMaster;
+import in.satish.props.AppProperties;
 import in.satish.service.PlanService;
 
 @RestController
 public class PlanMasterController {
 
-	@Autowired
 	private PlanService planService;
 	
+	private Map<String, String> messages;
+	
+	public PlanMasterController(PlanService planService, AppProperties appProp) {
+		this.planService = planService;
+		this.messages = appProp.getMessages();
+	}
 	@GetMapping("/categories")
 	public ResponseEntity<Map<Integer, String>> getCategories(){
 		Map<Integer, String> planCategories = planService.getPlanCategory();
@@ -31,12 +38,13 @@ public class PlanMasterController {
 	
 	@PostMapping("/plan")
 	public ResponseEntity<String> savePlanMaster(@RequestBody PlanMaster planMaster){
-		String msg;
+		String msg = AppConstants.EMPTY_STR;
+		
 		boolean savePlan = planService.savePlan(planMaster);
 		if(savePlan)
-			msg = "Plan Saved Successfully";
+			msg = messages.get(AppConstants.SAVE_SUCC);
 		else {
-			msg = "Plan Not Saved";
+			msg = messages.get(AppConstants.SAVE_FAIL);
 		}
 		return new ResponseEntity<>(msg, HttpStatus.CREATED);
 	}
@@ -56,14 +64,14 @@ public class PlanMasterController {
 	
 	@PutMapping("/plan")
 	public ResponseEntity<String> updatePlanMaster(@RequestBody PlanMaster planMaster){
-		String msg;
+		String msg=AppConstants.EMPTY_STR;
 		boolean updatePlan = planService.updatePlan(planMaster);
 		if(updatePlan)
 		{
-			msg = "Plan Master updated successfully !..";
+			msg = messages.get(AppConstants.UPDATE_SUCC);
 		}
 		else {
-			msg = "Not Updated Plan Master";
+			msg = messages.get(AppConstants.UPDATE_FAIL);
 		}
 		
 		return new ResponseEntity<> (msg, HttpStatus.OK);
@@ -71,24 +79,24 @@ public class PlanMasterController {
 	
 	@DeleteMapping("/plan/{planId}")
 	public ResponseEntity<String> deletePlanMaster(@PathVariable Integer planId){
-		String msg;
+		String msg=AppConstants.EMPTY_STR;
 		boolean deletePlan = planService.deletePlan(planId);
 		if(deletePlan) {
-			msg = "Plan Deleted Successfully !...";
+			msg = messages.get(AppConstants.DELETE_SUCC);
 		}else {
-			msg = "Plan Not Deeleted !...";
+			msg = messages.get(AppConstants.DELETE_FAIL);
 		}
 		
 		return new ResponseEntity<> (msg, HttpStatus.OK);
 	}
 	@PutMapping("/plan/{planId}/{status}")
 	public ResponseEntity<String> changPlanMasterStatus(@PathVariable Integer planId, @PathVariable String status){
-		String msg;
+		String msg=AppConstants.EMPTY_STR;
 		boolean changePlanStatus = planService.changePlanStatus(planId, status);
 		if(changePlanStatus) {
-			msg = "Activated this Plan Status !..";
+			msg = messages.get(AppConstants.CHANGE_SUCC);
 		}else {
-			msg = "Not Activated this Plan Status !..";
+			msg = messages.get(AppConstants.CHANGE_FAIL);
 		}
 		return new ResponseEntity<> (msg, HttpStatus.OK);
 		
